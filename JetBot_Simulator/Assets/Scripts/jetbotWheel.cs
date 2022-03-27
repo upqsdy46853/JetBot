@@ -35,19 +35,23 @@ public class jetbotWheel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float dt = Time.deltaTime;
-        // Wheel Rotation
-        wheelLeft.Rotate(+1*leftMotor*dt,0,0);
-        wheelRight.Rotate(-1*rightMotor*dt,0,0);
-        
-        // Vehicle Move
-        v = 0.5f*wheelRad*(leftMotor*Mathf.PI/180f) + 0.5f*wheelRad*(rightMotor*Mathf.PI/180f);
-        w = 0.5f*wheelRad*(leftMotor*Mathf.PI/180f)/wheelDist - 0.5f*wheelRad*(rightMotor*Mathf.PI/180f)/wheelDist;
-        
-        float delta_x = v*dt*Mathf.Cos(vehicle.eulerAngles.y*Mathf.PI/180f);
-        float delta_y = v*dt*Mathf.Sin(vehicle.eulerAngles.y*Mathf.PI/180f);
-        vehicle.position += new Vector3(delta_y, 0, delta_x);
-        vehicle.eulerAngles += new Vector3(0,w*180/Mathf.PI*dt,0);            
+        if(GetComponent<jetbotControl>().receive){
+            float dt = Time.deltaTime;
+            // Wheel Rotation
+            wheelLeft.Rotate(+1*leftMotor*dt,0,0);
+            wheelRight.Rotate(-1*rightMotor*dt,0,0);
+            
+            // Vehicle Move
+            v = 0.5f*wheelRad*(leftMotor*Mathf.PI/180f) + 0.5f*wheelRad*(rightMotor*Mathf.PI/180f);
+            w = 0.5f*wheelRad*(leftMotor*Mathf.PI/180f)/wheelDist - 0.5f*wheelRad*(rightMotor*Mathf.PI/180f)/wheelDist;
+            
+            float delta_x = v*dt*Mathf.Cos(vehicle.eulerAngles.y*Mathf.PI/180f);
+            float delta_y = v*dt*Mathf.Sin(vehicle.eulerAngles.y*Mathf.PI/180f);
+            vehicle.position += new Vector3(delta_y, 0, delta_x);
+            vehicle.eulerAngles += new Vector3(0,w*180/Mathf.PI*dt,0);            
+            GetComponent<jetbotControl>().receive = false;
+            GetComponent<jetbotCamera>().send = false;
+        }
     }
 
     public void updateMotorText()

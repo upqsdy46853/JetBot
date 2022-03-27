@@ -12,6 +12,7 @@ public class jetbotControl : MonoBehaviour
     private WebSocket ws;
     public jetbotWheel jw;
     private string nextCommand = null;
+    public bool receive = false;
     
     void Start()
     {
@@ -37,8 +38,11 @@ public class jetbotControl : MonoBehaviour
     void wheelControl(string command)
     {
         jetbotMotorCommand cdata = JsonUtility.FromJson<jetbotMotorCommand>(command);
-        if (cdata.flag == 0)
+        receive = true;
+        if (cdata.flag == 0){
             jw.reset();
+            GameObject.Find("Map1").GetComponent<resetMap>().reset();
+        }
         else if(cdata.flag == 1)
             jw.setLeftMotorValue(cdata.leftMotor);
         else if(cdata.flag == 2)
