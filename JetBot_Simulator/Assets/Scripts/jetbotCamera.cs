@@ -13,6 +13,7 @@ public class jetbotCamera : MonoBehaviour
     float invoke_timer = 0f;
     public float invoke_interval = 1.0f;
     public bool send = false;
+    public GameObject sensor;
 
     // Start is called before the first frame update
     void Start()
@@ -40,14 +41,14 @@ public class jetbotCamera : MonoBehaviour
     void SendMessage()
     {
         byte[] img = sendCameraTexture();
-        byte[] reward = BitConverter.GetBytes(GetComponent<getReward>().reward);
-        byte[] done = BitConverter.GetBytes(GetComponent<getReward>().done);
+        byte[] reward = BitConverter.GetBytes(sensor.GetComponent<getReward>().reward);
+        byte[] done = BitConverter.GetBytes(sensor.GetComponent<getReward>().done);
         byte[] byteArray = new byte[img.Length + reward.Length + done.Length];
         Buffer.BlockCopy(reward, 0, byteArray, 0, reward.Length);
         Buffer.BlockCopy(done, 0, byteArray, reward.Length, done.Length);
         Buffer.BlockCopy(img, 0, byteArray, reward.Length + done.Length, img.Length);
         ws.Send(byteArray);
-        GetComponent<getReward>().reward = 0;
+        sensor.GetComponent<getReward>().reward = 0;
     }
 
     byte[] sendCameraTexture(){

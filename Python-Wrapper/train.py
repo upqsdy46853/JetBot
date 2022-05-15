@@ -7,6 +7,7 @@ from dqn_model import DQN
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from unet_model import UNet
 
 
 GAMMA = 0.99
@@ -31,9 +32,10 @@ total_rewards = []
 acc_rewards = 0
 best_mean = 0
 cnt = 0
-device = 'cpu'
-net = DQN((3,45,80),k).to(device)
-tgt_net = DQN((3,45,80),k).to(device)
+device = 'cuda'
+net = DQN((3,128,128),k).to(device)
+tgt_net = DQN((3,128,128),k).to(device)
+
 epsilon = EPSILON_START
 optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE)
 
@@ -98,18 +100,22 @@ def execute(change):
     global frames, states, next_states, rewards, action, total_steps, episode, epsilon, acc_rewards, best_mean, cnt
 
     # Visualize
-    img = cv2.resize(change["new"],(80,45))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img[img<150] = 0
-    img[img>=150] = 255 
-    #cv2.imshow("camera", img)
-    #cv2.waitKey(1)
+    img = change["new"]
+    img = cv2.cvtColor(change['new'], cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (128, 128), interpolation=cv2.INTER_AREA).reshape(128*128, 3)
+    seg = np.ones(128*128)
+    seg[img[:,0]<100] = 0
+    seg[np.logical_and(img[:,0]>100, img[:,1]<100)] = 2
+    seg = np.reshape(seg, (128, 128))/2
+
     reward = change['reward']
+    if reward == 2:
+        reward = -10
     acc_rewards += reward
 
     frames += 1
     print('Episode:'+ str(episode) + ' Frames:' + str(frames) + ' Epsilon:' + str(epsilon))
-    next_states.append(img)
+    next_states.append(seg)
     rewards.append(reward)
 
     if len(exp_buffer) >= REPLAY_START_SIZE:
@@ -121,7 +127,7 @@ def execute(change):
         optimizer.step()
 
     if len(states) == k and len(next_states) == k:
-        if sum(rewards) == 0:
+        if sum(rewards) <= 0:
             cnt = cnt + 1
         else:
             cnt = 0
@@ -139,7 +145,7 @@ def execute(change):
         if np.random.random() < epsilon:
             act_v = np.random.randint(3)
         else:
-            state_v = torch.tensor([states]).to(device)
+            state_v = torch.tensor(np.array([states])).to(device)
             q_vals_v = net(state_v.float())
             _, act_v = torch.max(q_vals_v, dim=1)
         action = int(act_v)

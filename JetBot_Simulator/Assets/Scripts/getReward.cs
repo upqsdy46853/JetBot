@@ -15,7 +15,7 @@ public class getReward : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        print(reward);
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -25,6 +25,9 @@ public class getReward : MonoBehaviour
         }
         if(other.gameObject.tag == "End"){
             done = true;
+        }
+        if(other.gameObject.layer == 7){
+            reward = 2;
         }
     }
 }

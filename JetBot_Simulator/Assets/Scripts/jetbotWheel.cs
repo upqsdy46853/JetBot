@@ -44,7 +44,8 @@ public class jetbotWheel : MonoBehaviour
             // Vehicle Move
             v = 0.5f*wheelRad*(leftMotor*Mathf.PI/180f) + 0.5f*wheelRad*(rightMotor*Mathf.PI/180f);
             w = 0.5f*wheelRad*(leftMotor*Mathf.PI/180f)/wheelDist - 0.5f*wheelRad*(rightMotor*Mathf.PI/180f)/wheelDist;
-            
+            v*= 0.01f; 
+
             float delta_x = v*dt*Mathf.Cos(vehicle.eulerAngles.y*Mathf.PI/180f);
             float delta_y = v*dt*Mathf.Sin(vehicle.eulerAngles.y*Mathf.PI/180f);
             vehicle.position += new Vector3(delta_y, 0, delta_x);

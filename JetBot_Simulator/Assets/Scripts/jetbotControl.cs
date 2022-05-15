@@ -13,6 +13,7 @@ public class jetbotControl : MonoBehaviour
     public jetbotWheel jw;
     private string nextCommand = null;
     public bool receive = false;
+    public GameObject Map;
     
     void Start()
     {
@@ -41,7 +42,7 @@ public class jetbotControl : MonoBehaviour
         receive = true;
         if (cdata.flag == 0){
             jw.reset();
-            GameObject.Find("Map1").GetComponent<resetMap>().reset();
+            Map.GetComponent<resetMap>().reset();
         }
         else if(cdata.flag == 1)
             jw.setLeftMotorValue(cdata.leftMotor);
